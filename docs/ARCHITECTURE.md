@@ -16,7 +16,7 @@ flowchart LR
   Policy --> Answer[Case, SAR, next best actions]
   Answer --> Persist[Case memory written to graph]
   Persist --> MCP
-  Answer --> Export[Guarded submission export]
+  Answer --> Export[Guarded verified export]
   Engine --> Events[(SQLite events + revisions)]
   Engine --> Model[Ollama evidence reviewer]
 ```
@@ -103,7 +103,7 @@ drives a verdict.
 
 ## Trust boundaries
 
-- Organizer documents, retrieved narratives and model output are data, never instructions.
+- Source documents, retrieved narratives and model output are data, never instructions.
 - MCP tool arguments are validated against the server's own schema before they are sent.
 - GSQL literals are allowlisted before substitution.
 - `.env`, downloaded data, model artifacts and the local database stay out of Git.
