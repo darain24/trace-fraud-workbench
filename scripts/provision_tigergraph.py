@@ -287,7 +287,7 @@ def corpus():
     """The GraphRAG corpus: the fraud policy, the documented patterns, the regulatory
     reference list, and closed-case narratives.
 
-    The narratives are deduplicated by shape. The organizer's 5,565 analyst notes
+    The narratives are deduplicated by shape. The 5,565 historical analyst notes
     reduce to about 370 distinct templates once identifiers, dates and amounts are
     masked, so embedding all of them adds no retrievable meaning -- it just buries the
     policy text under a thousand near-identical sentences and makes every similarity

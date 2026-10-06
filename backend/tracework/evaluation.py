@@ -27,9 +27,9 @@ def overview():
             v: sum(a.case.verdict == v for a in answers)
             for v in ["fraud", "legitimate", "uncertain"]
         },
-        "submission_ready": bool(answers)
+        "verified": bool(answers)
         and len(answers) == 20
-        and all(c["submission_ready"] for c in checks),
+        and all(c["verified"] for c in checks),
         "historical": store.meta("evaluation"),
         "statistical_model": store.meta("scoring_model"),
         "benchmark_accuracy": None,

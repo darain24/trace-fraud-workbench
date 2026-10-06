@@ -1,6 +1,6 @@
 """Evidence assessment.
 
-Each finding below carries a log-odds weight fitted on the organizer's own closed
+Each finding below carries a log-odds weight fitted on the bank's own closed
 cases. Training used the 1,168 investigations opened before October 2016 whose
 flagged transaction scored at or above 0.82, because those are the alerts where the
 evidence, not the alert itself, had to decide; that subpopulation is 37.5% fraud,

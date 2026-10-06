@@ -1,4 +1,4 @@
-"""Download the organizer's public dataset, never the original Kaggle outcomes."""
+"""Download the public benchmark dataset, never the original Kaggle outcomes."""
 
 import concurrent.futures
 import re

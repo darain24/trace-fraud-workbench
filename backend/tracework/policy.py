@@ -1,4 +1,4 @@
-"""Deterministic implementation of the organizer's policy; no financial actions."""
+"""Deterministic implementation of the bank's fraud policy; no financial actions."""
 
 from dataclasses import dataclass
 

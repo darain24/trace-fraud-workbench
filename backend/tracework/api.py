@@ -205,7 +205,7 @@ def approvals(case_id: str):
 
 
 @app.get("/api/cases/{case_id}/export")
-def export(case_id: str, submission: bool = False):
+def export(case_id: str, verified: bool = False):
     r = store.get_case(case_id)
     if not r["result"]:
         raise HTTPException(409, "Investigate this case first")
@@ -213,7 +213,7 @@ def export(case_id: str, submission: bool = False):
     v = engine.validate(a)
     if v["errors"]:
         raise HTTPException(422, v["errors"])
-    if submission and not v["submission_ready"]:
+    if verified and not v["verified"]:
         raise HTTPException(
             409,
             "Draft only: TigerGraph evidence/persistence requirements are not verified.",
@@ -222,7 +222,7 @@ def export(case_id: str, submission: bool = False):
         a.model_dump(),
         headers={
             "Content-Disposition": f'attachment; filename="{case_id}.json"',
-            "X-Trace-Submission-Ready": str(v["submission_ready"]).lower(),
+            "X-Trace-Verified": str(v["verified"]).lower(),
         },
     )
 
@@ -258,7 +258,7 @@ def policy():
         raise HTTPException(404, "Dataset README has not been downloaded")
     text = path.read_text()
     return {
-        "source": "Organizer README — Fraud Policy v1.0",
+        "source": "Dataset README — Fraud Policy v1.0",
         "text": text.split("# Fraud Policy", 1)[1].split("# Answer Format", 1)[0],
     }
 

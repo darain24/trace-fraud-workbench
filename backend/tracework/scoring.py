@@ -1,4 +1,4 @@
-"""Temporal model trained exclusively on organizer historical cases, never benchmark labels."""
+"""Temporal model trained exclusively on historical closed cases, never benchmark labels."""
 
 import json
 import pickle

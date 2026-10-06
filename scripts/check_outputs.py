@@ -18,7 +18,7 @@ for id in ids:
         v = engine.validate(a)
         if v["errors"]:
             errors.append({"case": id, "errors": v["errors"]})
-        ready += v["submission_ready"]
+        ready += v["verified"]
     except Exception as e:
         errors.append({"case": id, "error": str(e)})
 print(
@@ -26,7 +26,7 @@ print(
         {
             "cases": len(ids),
             "valid": len(ids) - len(errors),
-            "submission_ready": ready,
+            "verified": ready,
             "errors": errors,
         },
         indent=2,
