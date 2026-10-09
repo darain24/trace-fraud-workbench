@@ -505,7 +505,7 @@ export default function App() {
                             title={
                               record?.written_to_graph
                                 ? "Case persistence confirmed."
-                                : "Real benchmark data · TigerGraph integration not yet verified"
+                                : "TigerGraph integration not yet verified"
                             }
                           >
                             <span className="status-dot" />
