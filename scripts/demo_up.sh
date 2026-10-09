@@ -42,6 +42,14 @@ for i in $(seq 1 60); do
   # GUI and KAFKACONN are deliberately down; everything else must be Online.
   pending=$(grep -E 'Warmup|Down' <<<"$status" | grep -vE 'GUI|KAFKACONN' || true)
   if [ -z "$pending" ]; then ok "graph services online (GUI and KafkaConnect left off)"; break; fi
+  # A fresh container has no graph yet, and GSE and GPE stay in Warmup until a
+  # schema exists ("rc: kNotFound" in the GSE log). GSQL is all that installing
+  # the schema needs, so waiting for the rest here would wait forever.
+  if [ -z "$(grep -vE 'GSE|GPE' <<<"$pending")" ] &&
+    docker exec -u tigergraph "$CONTAINER" tail -n 20 /home/tigergraph/tigergraph/log/gse/log.INFO 2>/dev/null |
+    grep -q 'rc: kNotFound'; then
+    ok "GSQL online; no graph schema yet, so GSE and GPE warm up after it is installed"; break
+  fi
   [ "$i" = 60 ] && { bad "services still not online"; echo "$pending"; exit 1; }
   sleep 15
 done
