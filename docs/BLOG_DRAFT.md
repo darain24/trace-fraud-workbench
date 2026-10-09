@@ -123,7 +123,7 @@ cardholder's reply, states the basis for that assumption in the case file, folds
 as evidence, and recommends again. Both recommendations survive in the answer, with what
 changed between them.
 
-Two places where that needed judgement:
+Two places where that needed a careful call:
 
 A customer report *is* a denial. Asking a cardholder to validate a transaction they just
 reported is not evidence gathering, so those cases skip the request and go straight to R2.
