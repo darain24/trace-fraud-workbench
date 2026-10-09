@@ -36,7 +36,8 @@ graph-load:
 	uv run python scripts/provision_tigergraph.py --data --documents --reset-documents
 	uv run python scripts/verify_tigergraph.py
 
-# One-off: the image is sized for a large host; this fits it to a laptop VM.
+# One-off: the image is sized for a large host; this fits it to a laptop VM, and
+# lifts the 16 s query timeout that an emulated container's first loads exceed.
 graph-tune:
 	docker exec -u tigergraph $(TG_LOCAL_CONTAINER) bash -lc '\
 	G=/home/tigergraph/tigergraph/app/cmd/gadmin; \
@@ -44,6 +45,7 @@ graph-tune:
 	$$G config set KafkaStreamLL.MaxMemorySizeMB 256 && \
 	$$G config set ZK.BasicConfig.Env "ZK_SERVER_HEAP=256;" && \
 	$$G config set Kafka.BasicConfig.Env "KAFKA_HEAP_OPTS=-Xms128M -Xmx512M;" && \
+	$$G config set RESTPP.Factory.DefaultQueryTimeoutSec 120 && \
 	$$G config apply -y && $$G restart all -y'
 
 fit:
