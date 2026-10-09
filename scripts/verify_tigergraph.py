@@ -5,13 +5,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 from tracework import analysis, retrieval, store, tigergraph
+from tracework.config import DATASET
+
+# A case that exercises device and region neighbours; any case ID may be passed.
+CASE = sys.argv[1] if len(sys.argv) > 1 else "HHG-014" if DATASET == "full" else "DEMO-009"
 
 
 async def main():
     health = await tigergraph.health()
     if not health["available"]:
         raise SystemExit(health["reason"])
-    trigger = store.get_case("HHG-014")["trigger"]
+    trigger = store.get_case(CASE)["trigger"]
     packet = analysis.collect(trigger)
     grounded = await retrieval.ground(packet, trigger)
     print(
