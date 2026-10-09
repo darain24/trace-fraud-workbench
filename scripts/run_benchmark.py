@@ -104,11 +104,11 @@ async def main(use_llm, require_graph, attempts):
             # persist while its evidence came only from the local projection. Use the
             # exporter's own criterion so a retry fixes what the export would refuse.
             grounded = bool(
-                (r.get("detail") or {}).get("validation", {}).get("submission_ready")
+                (r.get("detail") or {}).get("validation", {}).get("verified")
             )
             if require_graph and TG_URL and not grounded and attempt < attempts:
                 print(
-                    f"{case_id} attempt {attempt}: not submission-ready "
+                    f"{case_id} attempt {attempt}: not verified "
                     "(graph evidence, vector context or persistence missing), retrying",
                     flush=True,
                 )
@@ -127,7 +127,7 @@ async def main(use_llm, require_graph, attempts):
             break
     if incomplete:
         print(
-            f"\n{len(incomplete)} case(s) are not submission-ready: "
+            f"\n{len(incomplete)} case(s) are not verified: "
             + ", ".join(incomplete)
             + "\nThe exporter will refuse these.",
             flush=True,

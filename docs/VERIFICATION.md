@@ -30,7 +30,7 @@ through the official TigerGraph MCP server, on an Apple M3 with 8 GB of memory.
 
 | | |
 |---|---|
-| Cases | 20 / 20 graph-backed and submission-ready |
+| Cases | 20 / 20 graph-backed and verified |
 | Verdicts | 11 fraud · 6 legitimate · 3 uncertain |
 | Patterns | 4 `card_not_present_new_device` · 4 `card_not_present_fraud` · 4 `undocumented` · 1 `account_takeover` · 7 `none` |
 | Statuses | 7 `closed_fraud` · 6 `closed_legitimate` · 7 `escalated` |
@@ -42,7 +42,7 @@ through the official TigerGraph MCP server, on an Apple M3 with 8 GB of memory.
 | Graph and retrieval calls | 411 (20.6 per case) |
 | Local-model tokens | 21,122 (`qwen3:4b`, local, cached on rerun) |
 
-Independent audit of all 20 answers against the organizer's Answer Format passes: field
+Independent audit of all 20 answers against the benchmark's answer format passes: field
 sets, enum values, ID existence against the dataset, exposure arithmetic against the named
 transactions, SAR/action agreement, empty-SAR field discipline, narrative length 6–12
 sentences, summary length 2–6 sentences, and recommendation changes only where an evidence
@@ -110,7 +110,7 @@ finding in HHG-014.
   clears `TG_URL`, because without it the fixture cases were being written into the real
   workspace.
 - Production frontend build passes. Ruff passes.
-- `scripts/check_outputs.py`: 20 cases, 20 valid, 20 submission-ready, 0 errors.
+- `scripts/check_outputs.py`: 20 cases, 20 valid, 20 verified, 0 errors.
 - The exporter refuses any case that is not grounded, not written back with a verified
   read-back, or missing graph or document evidence. It caught a real instance of this
   during development, where a case persisted while its evidence was local-only.

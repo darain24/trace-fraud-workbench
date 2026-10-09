@@ -62,7 +62,7 @@ RESPONSE_TEXT = {
 def assumed_response(a):
     """Pick the reply to simulate, and say what it is based on.
 
-    The organizer does not supply customer replies, so this is an assumption and is
+    The dataset includes no customer replies, so this is an assumption and is
     recorded as one. It is keyed to the assessed probability rather than chosen to
     make the case tidy: where the evidence leans fraud the cardholder is assumed to
     deny, where it leans legitimate they are assumed to confirm, and where the
@@ -230,7 +230,7 @@ def write_narrative(trigger, a, packet, response):
     if response == "denied":
         lines.append(
             "When contacted, the cardholder denied authorising the transaction. This "
-            "reply is a simulation recorded in the case file; the organizer dataset "
+            "reply is a simulation recorded in the case file; the dataset "
             "supplies no customer replies, and no customer was contacted."
         )
     lines.append(
@@ -492,7 +492,7 @@ def apply_response(a, packet, response, origin="request"):
     if origin == "request":
         claim = (
             f"SIMULATED verification response: {RESPONSE_TEXT[response]}. The "
-            "organizer supplies no customer replies; this is an assumption recorded "
+            "the dataset includes no customer replies; this is an assumption recorded "
             "in evidence_requests, not a customer contact."
         )
         ref = "evidence_request:1"
@@ -800,7 +800,7 @@ def validate(answer):
     return {
         "schema_valid": True,
         "errors": errors,
-        "submission_ready": not errors
+        "verified": not errors
         and answer.case.written_to_graph
         and any(
             e.source == "graph" and e.ref.startswith("tigergraph:")

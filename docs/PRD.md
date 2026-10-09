@@ -2,20 +2,20 @@
 
 ## Product promise
 
-An investigator should be able to explain what happened, what is uncertain, what additional evidence matters, and which action the supplied bank policy permits. A compelling submission combines accurate graph investigation with visible decision changes and complete audit records.
+An investigator should be able to explain what happened, what is uncertain, what additional evidence matters, and which action the supplied bank policy permits. A useful investigation combines accurate graph evidence with visible decision changes and complete audit records.
 
-Primary audience: fraud analysts and hackathon judges. Constraints: no paid services; local development on an M3/8 GB Mac; TigerGraph remains required. The deadline prioritizes the delivery sequence without redefining the product's ambition.
+Primary audience: fraud analysts and investigation leads. Constraints: no paid services; runs on a laptop (developed on an M3 with 8 GB); TigerGraph is the source of record.
 
-## Scoring alignment
+## Quality goals
 
-| Criterion | Weight | Implementation |
-|---|---:|---|
-| Investigation accuracy | 25% | Weighted evidence findings fitted on the organizer's closed cases and held out (ROC-AUC 0.849); episode scope validated against 250 confirmed episodes; the bank's risk score excluded as a selection artefact |
-| Next best action | 25% | Policy-controlled actions, initial/final recommendations, explicit verification and escalation |
-| Explainability | 10% | Provenance, evidence graph, supporting/contradicting findings, short case summaries |
-| Agentic engineering | 15% | Stateful workflow, bounded local-model tool selection, durable events, idempotent evidence/approval operations |
-| Innovation | 15% | Decision-changing evidence scenarios, undocumented-pattern corroboration, candidate discovery, replay |
-| Demo completeness | 10% | Real-data workbench against a live local TigerGraph, reproducible exports, recorded verification |
+| Goal | Implementation |
+|---|---|
+| Investigation accuracy | Weighted evidence findings fitted on the bank's closed cases and held out (ROC-AUC 0.849); episode scope validated against 250 confirmed episodes; the bank's risk score excluded as a selection artefact |
+| Next best action | Policy-controlled actions, initial/final recommendations, explicit verification and escalation |
+| Explainability | Provenance, evidence graph, supporting/contradicting findings, short case summaries |
+| Agentic engineering | Stateful workflow, bounded local-model tool selection, durable events, idempotent evidence/approval operations |
+| Innovation | Decision-changing evidence scenarios, undocumented-pattern corroboration, candidate discovery, replay |
+| Reproducibility | Real-data workbench against a live local TigerGraph, reproducible exports, recorded verification |
 
 ## Required workflow
 
@@ -25,8 +25,8 @@ The state includes immutable initial actions, current actions, exposure, verdict
 
 ## Functional requirements
 
-1. All 20 organizer cases load into a searchable queue and can be investigated independently.
-2. Transaction, customer, card, device-profile, and region data are traceable to actual organizer rows.
+1. All 20 benchmark cases load into a searchable queue and can be investigated independently.
+2. Transaction, customer, card, device-profile, and region data are traceable to actual source rows.
 3. Card IDs are anchored and ambiguity is explicit; unnamed model features retain unnamed semantics.
 4. Existing confirmed and cleared historical cases inform evidence; new predictions never masquerade as confirmed outcomes.
 5. Device sharing needs behavioral corroboration. Graph links alone do not imply guilt.
@@ -34,7 +34,7 @@ The state includes immutable initial actions, current actions, exposure, verdict
 7. Every next action obeys the supplied policy and approval route. Missing settlement data prevents a claim that a purchase cleared.
 8. An original customer denial is distinguished from a simulated response. Scenario exploration is non-mutating; recorded simulated responses are visibly labeled.
 9. The interface supports evidence selection, graph inspection, timeline review, action history, approval simulation, SAR preview, export, and recorded replay.
-10. Graph records and vector grounding are required for submission readiness. Local-mode drafts cannot be silently promoted.
+10. Graph records and vector grounding are required for a verified export. Local-mode drafts cannot be silently promoted.
 11. Candidate discovery stays outside the benchmark folder. Evaluation reports actual measurements and limitations.
 12. Local model and embedding calls cannot fall back to paid endpoints.
 
@@ -49,10 +49,10 @@ The state includes immutable initial actions, current actions, exposure, verdict
 - Graph writes are independently read back before persistence is claimed.
 - Desktop and narrow-screen workflows remain usable; fonts are bundled locally.
 
-## Submission deliverables
+## Deliverables
 
-Working application, reproducible repository, twenty verified answer files in `cases/`, a 3–5 minute demo, technical blog, and social post linking the blog/demo and tagging TigerGraph. Publishing and real service setup require appropriate user-owned access.
+A working application, a reproducible repository, twenty verified reference answers in `examples/benchmark-results/`, and a recorded verification run (`docs/VERIFICATION.md`).
 
-## Current gates
+## Current status
 
-Local functionality and draft generation are implemented. Live TigerGraph setup, remote query compilation, full graph/vector loading, final output promotion, and recorded/published submission media remain gates. Historical scoring is explicitly advisory because its selected training cohort differs from benchmark cases. No claim of winning or hidden-key accuracy is made.
+The full pipeline runs against a live local TigerGraph: graph and vector loading, grounding with parity checks, case write-back with read-back, and guarded export. Historical scoring stays advisory because its training cohort differs from the benchmark cases. No claim of hidden-key accuracy is made.

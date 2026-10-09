@@ -138,7 +138,7 @@ async def local_rank(vector, k, cutoff, client):
 async def ground(packet, trigger):
     """Re-derive the evidence from TigerGraph and refuse to proceed if it disagrees.
 
-    Local SQLite is a projection of the same organizer CSVs and exists so the
+    Local SQLite is a projection of the same source CSVs and exists so the
     workbench stays usable when the graph is down. It is not the source of record: a
     case is only marked graph-backed once the graph agrees on the aggregate over the
     window under investigation, agrees transaction by transaction on the sample the

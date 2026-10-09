@@ -91,11 +91,11 @@ def test_invalid_ids_fail_validation(db):
     assert engine.validate(a)["errors"]
 
 
-def test_real_submission_is_blocked_without_graph(db):
+def test_verified_export_is_blocked_without_graph(db):
     fixture_case()
     with TestClient(app) as c:
         assert c.get("/api/cases/TEST-1/export").status_code == 200
-        assert c.get("/api/cases/TEST-1/export?submission=true").status_code == 409
+        assert c.get("/api/cases/TEST-1/export?verified=true").status_code == 409
 
 
 def test_approval_requires_matching_revision_route_and_is_idempotent(db):
@@ -127,8 +127,8 @@ def test_approval_requires_matching_revision_route_and_is_idempotent(db):
         )
 
 
-def test_graph_persistence_alone_is_not_submission_ready(db):
+def test_graph_persistence_alone_is_not_verified(db):
     a = fixture_case()
     a.case.written_to_graph = True
     a.case.graph_case_id = a.case_id
-    assert engine.validate(a)["submission_ready"] is False
+    assert engine.validate(a)["verified"] is False

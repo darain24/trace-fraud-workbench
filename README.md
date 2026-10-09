@@ -1,6 +1,6 @@
 # Trace
 
-**Evidence before action.** An agentic fraud-investigation workbench built on TigerGraph for Hacker House Goa Task 4.
+**Evidence before action.** An agentic fraud-investigation workbench built on TigerGraph.
 
 A fraud alert is not a verdict. Trace takes one of the twenty benchmark triggers, gathers evidence from a TigerGraph knowledge graph and vector store, weighs it against the shapes the bank's own closed cases actually took, decides whether it can act, asks for more evidence when it cannot, recommends actions under the supplied policy with their approval routes, and writes the case back into the graph so the next investigation can find it.
 
@@ -29,7 +29,7 @@ What survives when the score is removed is behaviour, and it inverts the obvious
 
 ## Assessment model
 
-Each finding carries a log-odds weight fitted on the organizer's own closed cases — investigations opened before October 2016 whose flagged transaction scored 0.82 or above, because those are the alerts where evidence rather than the alert had to decide. That subpopulation is 37.5% fraud, close to the benchmark's stated mix.
+Each finding carries a log-odds weight fitted on the bank's own closed cases — investigations opened before October 2016 whose flagged transaction scored 0.82 or above, because those are the alerts where evidence rather than the alert had to decide. That subpopulation is 37.5% fraud, close to the benchmark's stated mix.
 
 **Held out on the 278 October alerts of the same kind (48.2% fraud): ROC-AUC 0.849, accuracy 0.791, Brier 0.157.**
 
@@ -122,13 +122,13 @@ uv run python scripts/verify_tigergraph.py
 ```bash
 uv run python scripts/train_assessment.py          # optional advisory model
 uv run python scripts/run_benchmark.py --require-graph
-uv run python scripts/export_submission.py
+uv run python scripts/export_results.py
 ./scripts/dev.sh
 ```
 
 Open http://127.0.0.1:5173. API docs at http://127.0.0.1:8000/docs.
 
-`--require-graph` re-runs any case that did not end up graph-backed. Community Edition on a small container drops a service under load often enough that one pass is not a reliable result. `export_submission.py` refuses to promote a case into `cases/` unless it is grounded in the graph, written back with a verified read-back, carries both graph and document evidence, and passes every policy and ID check.
+`--require-graph` re-runs any case that did not end up graph-backed. Community Edition on a small container drops a service under load often enough that one pass is not a reliable result. `export_results.py` refuses to promote a case into `examples/benchmark-results/` unless it is grounded in the graph, written back with a verified read-back, carries both graph and document evidence, and passes every policy and ID check.
 
 ## Verify
 
@@ -142,7 +142,7 @@ uv run python scripts/verify_tigergraph.py      # graph + vector grounding
 uv run python scripts/fit_evidence_model.py     # refit and re-verify the weights
 ```
 
-Tests cover policy thresholds and approval routes, the ban on the risk score contributing weight, non-mutating scenario exploration, evidence-request supersession, preserved initial recommendations, fabricated IDs, persistence that cannot be claimed without a verified read-back, and the submission guards.
+Tests cover policy thresholds and approval routes, the ban on the risk score contributing weight, non-mutating scenario exploration, evidence-request supersession, preserved initial recommendations, fabricated IDs, persistence that cannot be claimed without a verified read-back, and the verified-export guards.
 
 ## How TigerGraph is used
 
@@ -156,7 +156,7 @@ Parity is checked by **aggregate plus bounded sample** rather than by pulling ev
 
 **Vector store.** `Document` carries a 384-dimension `all-minilm` embedding, added through MCP with `add_vector_attribute` and filled with `upsert_vectors`. Retrieval is filtered by `closed_at`, so GraphRAG obeys the same time boundary as the graph traversal, and the policy chunks and case narratives are ranked separately so a recommendation always has a rule to cite.
 
-The corpus is 503 documents, not 5,565. The organizer's analyst notes collapse to about 370 distinct templates once identifiers, dates and amounts are masked; embedding all of them adds no retrievable meaning and buries the 37 policy chunks under a thousand near-identical sentences. Every case belonging to a benchmark customer or card is kept in full.
+The corpus is 503 documents, not 5,565. The historical analyst notes collapse to about 370 distinct templates once identifiers, dates and amounts are masked; embedding all of them adds no retrievable meaning and buries the 37 policy chunks under a thousand near-identical sentences. Every case belonging to a benchmark customer or card is kept in full.
 
 **On the similarity search.** MCP's `search_top_k_similarity` generates and *installs* a fresh GSQL query for every distinct search — `_vec_search_<hash>` — so each call compiles native code. That took 116 seconds per search here and was what kept killing GSQL. `vectorSearch` itself takes the query vector as a query parameter, so it only exists inside an installed query, and this container cannot compile one at all. So: where `trace_vector_search` is installed, the search runs server-side; where it is not, the top-k scan runs client-side over the same TigerGraph-held vectors and the winning documents are read back out of the graph by id. Which path ran is recorded on every case. Grounding went from 100–150 seconds to 2–6.
 
@@ -175,7 +175,7 @@ Community Edition is free and complete, but its defaults assume a server. Three 
 - `addr1` is an anonymised billing-region code, not a geolocation. No impossible-travel claims.
 - The V, C, D, M and numeric `id_` columns are unnamed Vesta features. They are used as signals and described as such, never given invented meanings.
 - Merchant identity and authorisation settlement status are not in the dataset, so recurring-charge findings are stated as hypotheses.
-- Card IDs are propagated from organizer anchors only where the six-field card signature maps unambiguously. Unresolved cards keep internal IDs and never appear in a submission.
+- Card IDs are propagated from benchmark anchors only where the six-field card signature maps unambiguously. Unresolved cards keep internal IDs and never appear in an exported answer.
 - Prior cases are retrieved only if closed before the investigation's cutoff.
 - Customer replies are simulated, labelled `SIMULATED`, and recorded in `evidence_requests` with the basis for the assumption.
 - No original Kaggle files are used to recover outcomes.
@@ -186,14 +186,18 @@ Community Edition is free and complete, but its defaults assume a server. Three 
 - `frontend/` — React workbench: timeline, relationship graph, weighted findings breakdown, scenario explorer, approvals, event history.
 - `tigergraph/` — schema and query definitions.
 - `scripts/` — download, ingest, provision, verify, train, benchmark, review, export.
-- `docs/` — architecture, PRD, demo script, blog draft, verification report, submission checklist.
-- `cases/` — the twenty submission answers, promoted only by the guarded exporter.
+- `docs/` — architecture, PRD, walkthrough, blog draft, verification report.
+- `examples/benchmark-results/` — twenty reference answers, promoted only by the guarded exporter.
 - `output/draft-cases/` — drafts from the most recent run (git-ignored).
 
 ## Limitations
 
 The assessment is fitted on investigated alerts, which are not the general transaction population; its probabilities are calibrated for that frame. Holdout accuracy on October alerts is not benchmark accuracy, and the benchmark answer key is hidden. The historical gradient-boosted model in `scripts/train_assessment.py` scores ROC-AUC 0.966 on October but saturates at 0.99 on 19 of the 20 benchmark cases — a plain distribution mismatch — so it stays advisory and never drives a verdict. Approvals in the UI are demo controls, not role-based authentication. Every banking and regulatory action is simulated.
 
-## Attribution
+## Origin
 
-IEEE-CIS Fraud Detection dataset, Vesta Corporation, via the IEEE Computational Intelligence Society; adapted by TigerGraph for Hacker House Goa 2026. No dataset is redistributed in this repository.
+Trace started as my solo entry for TigerGraph's Hacker House Goa 2026 (Task 4), and has since been extended into a standalone project.
+
+## License and data
+
+Code is MIT-licensed (see `LICENSE`). The benchmark data is an adaptation of the IEEE-CIS Fraud Detection dataset (Vesta Corporation, via the IEEE Computational Intelligence Society), prepared by TigerGraph. None of it is redistributed in this repository. See `DATA.md`.

@@ -1,8 +1,8 @@
-# Submission answers
+# Benchmark results
 
-The twenty benchmark answers, one JSON file per case from `case_pack.csv`.
+Twenty reference answers produced by Trace on the benchmark case pack, one JSON file per case from `case_pack.csv`.
 
-Promoted here only by `scripts/export_submission.py`, which refuses any case that is not
+Promoted here only by `scripts/export_results.py`, which refuses any case that is not
 grounded in TigerGraph, not written back with a verified read-back, missing graph or
 document evidence, or failing a policy or ID check. Drafts live in `output/draft-cases/`
 and are never promoted silently.

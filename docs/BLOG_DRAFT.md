@@ -1,6 +1,6 @@
 # The fraud model that was right about everything except fraud
 
-*Building an agentic fraud investigator on TigerGraph for Hacker House Goa.*
+*Building an agentic fraud investigator on TigerGraph.*
 
 We were given six months of card transactions, 5,565 closed investigations, a fraud
 policy, and twenty alerts to investigate. Every transaction carried a risk score from the

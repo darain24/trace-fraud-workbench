@@ -214,7 +214,7 @@ SAFE = re.compile(r"^[A-Za-z0-9_.:\- ]{1,64}$")
 def literal(value):
     """Inline a parameter into interpreted GSQL. Interpreted queries take no
     parameter list, so values are substituted into the text; everything inlined here
-    is an identifier or timestamp from the organizer dataset and must match a strict
+    is an identifier or timestamp from the dataset and must match a strict
     allowlist before it reaches the server."""
     text = str(value)
     if not SAFE.match(text):

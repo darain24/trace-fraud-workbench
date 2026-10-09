@@ -1,23 +1,22 @@
-# Trace demo — 4 minutes
+# Trace walkthrough — 4 minutes
 
-Record the actual running app against the live local TigerGraph. Everything below is true
-of the current build; do not claim anything beyond it.
+A guided tour of the running app against a live local TigerGraph, also used as the script
+for the demo video. Everything below is true of the current build.
 
-Before recording: `docker start tigergraph`, wait for `gadmin status` to show no `Warmup`,
-start the MCP server, start `./scripts/dev.sh`, confirm the header reads **20/20** graph
-persistence.
+Before starting, run `./scripts/demo_up.sh` and wait for the green line, then confirm the
+header reads **20/20** graph persistence.
 
 ## 0:00–0:35 — The finding
 
-> "An alert is not a verdict. We were given a bank's own fraud model score on every
-> transaction, and the first thing we did was check it against the bank's own closed
+> "An alert is not a verdict. The dataset carries the bank's own fraud model score on every
+> transaction, and the first thing I did was check it against the bank's own closed
 > cases. It scores ROC-AUC 0.053 — inverted. Every cleared case had scored 0.82 or higher."
 
 > "That model isn't broken. It's the thing that decides which alerts get opened, and the
 > ones it shouts loudest about are the customers who bought a new phone or went on a trip.
-> So we don't use it. Trace scores the evidence instead."
+> So Trace doesn't use it. Trace scores the evidence instead."
 
-Show the case queue and the header: 20 organizer cases, 20 saved, 20/20 written to
+Show the case queue and the header: 20 benchmark cases, 20 saved, 20/20 written to
 TigerGraph.
 
 ## 0:35–1:30 — Follow the network (HHG-014)
@@ -79,7 +78,7 @@ i.actions "CREATE_CASE,ESCALATE_TO_ANALYST,MONITOR_CARD,FILE_REPORT,MONITOR_CONN
 Show the evaluation view.
 
 > "On two hundred October closed cases, the bank's score alone gets 27 right. Trace gets
-> 111 of the 139 it's willing to decide. Our first hand-tuned version got zero out of forty
+> 111 of the 139 it's willing to decide. My first hand-tuned version got zero out of forty
 > — it was pointed the wrong way. That's the whole lesson: a valid JSON file and a
 > good-looking interface tell you nothing about whether the investigation is right."
 

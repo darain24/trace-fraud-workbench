@@ -1,4 +1,4 @@
-"""Streaming organizer-data ingestion; anchored card mappings, no invented benchmark IDs."""
+"""Streaming source-data ingestion; anchored card mappings, no invented benchmark IDs."""
 
 import sys
 from pathlib import Path
@@ -136,7 +136,7 @@ def main():
                     "UPDATE transactions SET card_id=?,card_verified=1 WHERE signature=? AND card_id=''",
                     (next(iter(ids)), sig),
                 )
-        # Unanchored signatures have an internal identifier, never an exported organizer card ID.
+        # Unanchored signatures have an internal identifier, never an exported benchmark card ID.
         for row in c.execute(
             "SELECT DISTINCT signature FROM transactions WHERE card_id='' "
         ).fetchall():
@@ -162,7 +162,7 @@ def main():
             "benchmark_cases": len(cases),
             "anchored_signatures": sum(len(v) == 1 for v in mapping.values()),
             "ambiguous_signatures": len(ambiguous),
-            "mapping_method": "Exact six-field card signature propagated only from unambiguous organizer anchors. Unresolved signatures remain internal; never exported as canonical cards.",
+            "mapping_method": "Exact six-field card signature propagated only from unambiguous benchmark anchors. Unresolved signatures remain internal; never exported as canonical cards.",
             "verified_transactions": c.execute(
                 "SELECT count(*) FROM transactions WHERE card_verified=1"
             ).fetchone()[0],

@@ -337,7 +337,7 @@ export default function App() {
                   ? "Explore candidate networks beyond the twenty benchmark cases."
                   : page === "Evaluation"
                     ? "Real checks. Transparent limitations. No invented benchmark scores."
-                    : "The organizer’s rules govern every recommendation and approval route."}
+                    : "The bank’s fraud policy governs every recommendation and approval route."}
             </p>
           </header>
           {error && (
@@ -366,7 +366,7 @@ export default function App() {
               <Stat
                 label="Benchmark cases"
                 value={String(cases.length)}
-                note="Organizer case pack"
+                note="Benchmark case pack"
               />
               <Stat
                 label="Investigations saved"
@@ -497,7 +497,7 @@ export default function App() {
                             title={
                               record?.written_to_graph
                                 ? "Case persistence confirmed."
-                                : "Real organizer data · TigerGraph integration not yet verified"
+                                : "Real benchmark data · TigerGraph integration not yet verified"
                             }
                           >
                             <span className="status-dot" />
@@ -1132,7 +1132,7 @@ export default function App() {
                     "TigerGraph case persistence verified",
                     metrics?.graph_verified === 20,
                   ],
-                  ["Submission-ready integration", metrics?.submission_ready],
+                  ["Verified graph integration", metrics?.verified],
                 ].map(([label, ok]) => (
                   <div key={String(label)}>
                     <span className={ok ? "check-icon" : "pending-icon"}>
@@ -1229,7 +1229,7 @@ export default function App() {
           {page === "Policy library" && (
             <section className="standalone policy-library">
               <div className="panel-heading">
-                <h2>Organizer fraud policy</h2>
+                <h2>Bank fraud policy</h2>
                 <Badge tone="green">Version 1.0</Badge>
               </div>
               <p className="footnote">
@@ -1269,7 +1269,7 @@ export default function App() {
                 <div className="service-row">
                   <Globe2 />
                   <div>
-                    <b>Organizer dataset</b>
+                    <b>Source dataset</b>
                     <p>
                       {health?.dataset
                         ? `${health.dataset.transactions.toLocaleString()} transactions · ${health.dataset.historical_cases.toLocaleString()} historical cases`
@@ -1454,7 +1454,7 @@ export default function App() {
                   <ArrowDownToLine size={15} /> Download draft JSON
                 </a>
                 <p className="footnote">
-                  Draft export. Submission readiness requires verified graph
+                  Draft export. Verified export requires verified graph
                   integration.
                 </p>
               </>
