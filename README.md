@@ -3,7 +3,7 @@
 **Evidence before action.** An agentic fraud-investigation workbench on a
 TigerGraph knowledge graph, running entirely on your own machine.
 
-[![CI](https://github.com/darain24/hhgoa_task4/actions/workflows/ci.yml/badge.svg)](https://github.com/darain24/hhgoa_task4/actions/workflows/ci.yml)
+[![CI](https://github.com/darain24/trace-fraud-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/darain24/trace-fraud-workbench/actions/workflows/ci.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![TigerGraph CE 4.2.5](https://img.shields.io/badge/TigerGraph-CE%204.2.5-orange)
