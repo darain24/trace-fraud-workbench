@@ -26,6 +26,17 @@ next investigation can find it.
 - **Local and free.** TigerGraph Community Edition in Docker, Ollama for reasoning
   and embeddings. No cloud account, no API key, no billing.
 
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/findings.png" alt="Weighted findings and the policy's recommended actions with their approval routes"></td>
+    <td width="50%"><img src="docs/images/scenarios.png" alt="What would change this decision: the policy's actions for each possible cardholder reply"></td>
+  </tr>
+  <tr>
+    <td>The probability as a sum of named log-odds weights, and each recommended action with its approval route.</td>
+    <td>What would change the decision: the policy's answer to each possible cardholder reply, without touching the case.</td>
+  </tr>
+</table>
+
 ## The finding that shaped it
 
 Inside the bank's 5,565 closed investigations, its own risk score is
