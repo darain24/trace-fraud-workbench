@@ -58,7 +58,11 @@ up:
 	./scripts/demo_up.sh
 
 test:
-	uv run pytest -q
+	uv run pytest -q --cov --cov-report=term-missing:skip-covered
+	npm test --prefix frontend
 
 lint:
 	uv run ruff check .
+	uv run ruff format --check .
+	npm run lint --prefix frontend
+	npm run format:check --prefix frontend
