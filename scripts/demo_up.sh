@@ -59,12 +59,19 @@ curl -sf -m 5 http://127.0.0.1:11434/api/tags >/dev/null 2>&1 || { nohup ollama 
 curl -sf -m 5 http://127.0.0.1:11434/api/tags >/dev/null 2>&1 && ok "ollama responding" || bad "ollama not responding"
 
 say "4/5  TigerGraph MCP server"
-if ! lsof -ti:9001 >/dev/null 2>&1; then
-  nohup uv run tigergraph-mcp --env-file .env --transport streamable-http \
-    --host 127.0.0.1 --port 9001 >/tmp/trace-mcp.log 2>&1 &
+# Ask the server itself: with docker compose the TigerGraph container publishes
+# :9001, so the port stays bound even while the MCP container is stopped.
+mcp_up() { curl -s -m 5 -o /dev/null http://127.0.0.1:9001/mcp; }
+if ! mcp_up; then
+  if docker compose ps -a -q mcp 2>/dev/null | grep -q .; then
+    docker compose start mcp >/dev/null 2>&1
+  else
+    nohup uv run tigergraph-mcp --env-file .env --transport streamable-http \
+      --host 127.0.0.1 --port 9001 >/tmp/trace-mcp.log 2>&1 &
+  fi
   sleep 8
 fi
-lsof -ti:9001 >/dev/null 2>&1 && ok "mcp on :9001" || { bad "mcp failed; see /tmp/trace-mcp.log"; exit 1; }
+mcp_up && ok "mcp on :9001" || { bad "mcp failed; see /tmp/trace-mcp.log or docker compose logs mcp"; exit 1; }
 if [ "$GRAPH_ONLY" = 1 ]; then
   printf '\033[42;30m GRAPH READY \033[0m TigerGraph, Ollama and MCP are up\n'
   exit 0
