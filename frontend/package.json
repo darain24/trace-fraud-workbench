@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --host 127.0.0.1"
+    "preview": "vite preview --host 127.0.0.1",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write src *.ts *.js",
+    "format:check": "prettier --check src *.ts *.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",
@@ -17,11 +21,22 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "globals": "^15.15.0",
+    "jsdom": "^26.1.0",
     "prettier": "^3.9.8",
     "typescript": "~5.7.3",
-    "vite": "^6.1.0"
+    "typescript-eslint": "^8.71.1",
+    "vite": "^6.1.0",
+    "vitest": "^3.2.7"
   }
 }

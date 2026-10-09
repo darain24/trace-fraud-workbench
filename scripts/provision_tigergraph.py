@@ -125,7 +125,8 @@ def scope(c, full):
         present += [
             r[0]
             for r in c.execute(
-                "SELECT id FROM transactions WHERE id IN (%s)" % ",".join("?" * len(part)),
+                "SELECT id FROM transactions WHERE id IN (%s)"
+                % ",".join("?" * len(part)),
                 part,
             )
         ]
@@ -190,12 +191,18 @@ async def load(full=False):
                 await nodes(
                     client,
                     "BillingRegion",
-                    [{"id": v} for v in sorted({t["region"] for t in batch if t["region"]})],
+                    [
+                        {"id": v}
+                        for v in sorted({t["region"] for t in batch if t["region"]})
+                    ],
                 )
                 await nodes(
                     client,
                     "EmailDomain",
-                    [{"id": v} for v in sorted({t["email"] for t in batch if t["email"]})],
+                    [
+                        {"id": v}
+                        for v in sorted({t["email"] for t in batch if t["email"]})
+                    ],
                 )
                 await edges(
                     client,
@@ -275,9 +282,7 @@ async def load(full=False):
                     sequence.append((previous[r["card_id"]], r["id"]))
                 previous[r["card_id"]] = r["id"]
                 if len(sequence) >= 1000:
-                    await edges(
-                        client, "NEXT", "Transaction", "Transaction", sequence
-                    )
+                    await edges(client, "NEXT", "Transaction", "Transaction", sequence)
                     sequence = []
             await edges(client, "NEXT", "Transaction", "Transaction", sequence)
             print("NEXT sequence edges written", flush=True)
@@ -325,7 +330,9 @@ def corpus():
         ]
         customers = {t["customer_id"] for t in triggers}
         cards = {t["card_id"] for t in triggers}
-        history = [dict(r) for r in c.execute("SELECT * FROM history ORDER BY closed_at")]
+        history = [
+            dict(r) for r in c.execute("SELECT * FROM history ORDER BY closed_at")
+        ]
     seen = set()
     for h in history:
         essential = h["customer_id"] in customers or h["card_id"] in cards

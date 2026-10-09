@@ -42,6 +42,7 @@ PATTERN_TEXT = {
     "none": "no identified fraud pattern",
 }
 
+
 def clause(claim):
     """First sentence of a finding, for prose that reads as prose."""
     return claim.split(". ")[0].rstrip(".").strip()
@@ -187,7 +188,7 @@ def write_narrative(trigger, a, packet, response):
     if f["device"]:
         lines.append(
             f"The online activity originated from the device profile "
-            f"\"{f['device']}\", which the identity record marks as "
+            f'"{f["device"]}", which the identity record marks as '
             f"{f['new_device'] or 'not recorded'} for this account"
             + (
                 f" and which carries the proxy indicator {f['proxy']}."
@@ -282,7 +283,9 @@ def build_answer(trigger, a, packet, response=None, previous=None, tokens=0, lat
         response, basis = assumed_response(a)
         requests.append(
             EvidenceRequest(
-                type="step_up_auth" if a["probability"] >= 0.5 else "customer_validation",
+                type="step_up_auth"
+                if a["probability"] >= 0.5
+                else "customer_validation",
                 asked_after_step=len(store.events(trigger["case_id"])),
                 assumed_response=(
                     f"SIMULATED ({response}): {RESPONSE_TEXT[response]}. " + basis

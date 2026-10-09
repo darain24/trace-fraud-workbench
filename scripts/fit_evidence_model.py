@@ -101,7 +101,9 @@ def features(c, t, cutoff):
 def build(limit):
     rows = []
     with store.connect() as c:
-        history = [dict(r) for r in c.execute("SELECT * FROM history ORDER BY opened_at")]
+        history = [
+            dict(r) for r in c.execute("SELECT * FROM history ORDER BY opened_at")
+        ]
         if limit:
             history = history[:limit]
         for i, h in enumerate(history):
@@ -180,5 +182,7 @@ def main(limit):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("--limit", type=int, default=0, help="cap history rows (for a quick run)")
+    p.add_argument(
+        "--limit", type=int, default=0, help="cap history rows (for a quick run)"
+    )
     main(p.parse_args().limit)

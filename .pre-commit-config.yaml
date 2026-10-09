@@ -1,0 +1,22 @@
+# pre-commit install   # then these run on every commit
+#
+# Local hooks, so they use the exact ruff from uv.lock and the prettier from
+# frontend/package-lock.json, the same versions CI runs.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: prettier
+        name: prettier
+        entry: frontend/node_modules/.bin/prettier --write --ignore-unknown
+        language: system
+        files: ^frontend/(src/|[^/]+\.(ts|js)$)
