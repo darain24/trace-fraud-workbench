@@ -52,6 +52,9 @@ services:
       TG_GRAPHNAME: ${TG_GRAPHNAME:-Trace}
       TG_USERNAME: ${TG_USERNAME:-tigergraph}
       TG_PASSWORD: ${TG_PASSWORD:-tigergraph}
+      # Every call re-checks the graph first; an emulated container under load
+      # can take longer than the default 10 s to answer that check.
+      TG_HTTP_VALIDATE_TIMEOUT: "60"
     depends_on:
       - tigergraph
     # The graph takes minutes to warm up; keep the server up until it answers.
