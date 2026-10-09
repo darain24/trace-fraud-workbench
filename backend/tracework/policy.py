@@ -140,7 +140,9 @@ def decide(s: Situation) -> list[Action]:
     # R9 requires coordinated or repeated abuse *across customers* before a report,
     # not merely activity that matches none of the five documented typologies. An
     # unmatched single-account episode gets a case and an analyst, not a filing.
-    reportable = s.exposure > 1000 or s.shared_fraud or (s.undocumented and s.shared_fraud)
+    reportable = (
+        s.exposure > 1000 or s.shared_fraud or (s.undocumented and s.shared_fraud)
+    )
     if strongly_suspected and reportable:
         add("CREATE_CASE", "§3a: every report must have an internal case.")
         add(

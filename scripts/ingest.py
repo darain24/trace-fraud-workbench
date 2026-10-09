@@ -30,7 +30,9 @@ def main():
         "closed_cases_history.csv",
     ]:
         if not (raw / f).exists():
-            fetch = "make demo-data" if DATASET == "demo" else "scripts/download_data.py"
+            fetch = (
+                "make demo-data" if DATASET == "demo" else "scripts/download_data.py"
+            )
             raise SystemExit(f"Missing {raw / f}; run {fetch}")
     if (raw / DEMO_MARKER).exists() != (DATASET == "demo"):
         found = "synthetic demo" if DATASET == "full" else "full benchmark"

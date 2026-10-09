@@ -8,7 +8,9 @@ from tracework import analysis, retrieval, store, tigergraph
 from tracework.config import DATASET
 
 # A case that exercises device and region neighbours; any case ID may be passed.
-CASE = sys.argv[1] if len(sys.argv) > 1 else "HHG-014" if DATASET == "full" else "DEMO-009"
+CASE = (
+    sys.argv[1] if len(sys.argv) > 1 else "HHG-014" if DATASET == "full" else "DEMO-009"
+)
 
 
 async def main():

@@ -41,9 +41,7 @@ def attributes(value, vertex_type):
                 # attribute key with the set alias; strip it so callers see plain
                 # attribute names either way.
                 flat = {k.split(".")[-1]: val for k, val in v["attributes"].items()}
-                found.append(
-                    {**flat, "id": str(v.get("v_id", flat.get("id", "")))}
-                )
+                found.append({**flat, "id": str(v.get("v_id", flat.get("id", "")))})
             else:
                 for child in v.values():
                     walk(child)
@@ -146,9 +144,9 @@ async def ground(packet, trigger):
     """
     f = packet["flagged"]
     calls = 0
-    window_start = (
-        analysis.dt(trigger["opened_at"]) - timedelta(days=14)
-    ).isoformat(sep=" ")
+    window_start = (analysis.dt(trigger["opened_at"]) - timedelta(days=14)).isoformat(
+        sep=" "
+    )
     sample_from = (analysis.dt(f["ts"]) - timedelta(hours=48)).isoformat(sep=" ")
     # Count the window straight from the projection. Deriving it from the evidence
     # packet compares different sets: `baseline` is capped at its 300 most recent
@@ -163,9 +161,7 @@ async def ground(packet, trigger):
     local_count, local_total = row["n"], row["total"]
     local = [
         t
-        for t in {
-            x["id"]: x for x in packet["baseline"] + packet["timeline"]
-        }.values()
+        for t in {x["id"]: x for x in packet["baseline"] + packet["timeline"]}.values()
         if t["ts"] >= window_start
     ]
     async with tigergraph.bulk(timeout=600) as client:
@@ -252,9 +248,9 @@ async def ground(packet, trigger):
                 {
                     "device_id": hashlib.sha256(f["device"].encode()).hexdigest(),
                     "cutoff": trigger["opened_at"],
-                    "start_at": (
-                        analysis.dt(f["ts"]) - timedelta(days=30)
-                    ).isoformat(sep=" "),
+                    "start_at": (analysis.dt(f["ts"]) - timedelta(days=30)).isoformat(
+                        sep=" "
+                    ),
                 },
                 client=client,
             )
@@ -352,9 +348,9 @@ async def ground(packet, trigger):
             {
                 "card_id": trigger["card_id"],
                 "cutoff": trigger["opened_at"],
-                "start_at": (
-                    analysis.dt(f["ts"]) - timedelta(days=30)
-                ).isoformat(sep=" "),
+                "start_at": (analysis.dt(f["ts"]) - timedelta(days=30)).isoformat(
+                    sep=" "
+                ),
             },
             client=client,
         )

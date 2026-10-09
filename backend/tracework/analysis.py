@@ -240,11 +240,7 @@ def assess(packet, trigger):
     flags = json.loads(f["match_flags"])
     mF = sum(v == "F" for v in flags.values())
     mixed = len({t["channel"] for t in card48}) > 1
-    hour = [
-        t
-        for t in same
-        if timedelta(0) <= when - dt(t["ts"]) <= timedelta(hours=1)
-    ]
+    hour = [t for t in same if timedelta(0) <= when - dt(t["ts"]) <= timedelta(hours=1)]
     tiny = [
         t
         for t in hour
@@ -466,11 +462,10 @@ def assess(packet, trigger):
         )
         >= 2
     )
-    profile_episode = [
-        t for t in same if t["device"] == f["device"] and f["device"]
-    ]
+    profile_episode = [t for t in same if t["device"] == f["device"] and f["device"]]
     shared_fraud = bool(
-        len(connected) >= 2 and (testing or historical_network or len(profile_episode) >= 2)
+        len(connected) >= 2
+        and (testing or historical_network or len(profile_episode) >= 2)
     )
     if packet["neighbors"]:
         others = len({t["customer_id"] for t in packet["neighbors"]})
@@ -602,7 +597,9 @@ def assess(packet, trigger):
             pattern = "account_takeover"
         elif f["channel"] == "in_person" and region_new:
             pattern = "out_of_region_use"
-        elif f["channel"] == "online" and f["device"] and f["device"] not in devices_seen:
+        elif (
+            f["channel"] == "online" and f["device"] and f["device"] not in devices_seen
+        ):
             pattern = "card_not_present_new_device"
         elif f["channel"] == "online":
             pattern = "card_not_present_fraud"

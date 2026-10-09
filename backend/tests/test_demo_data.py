@@ -40,7 +40,12 @@ def test_column_contract(raw):
     with open(raw / "transactions.csv", newline="") as f:
         header = next(csv.reader(f))
     assert len(header) == 397
-    assert header[:4] == ["TransactionID", "TransactionDT", "TransactionAmt", "ProductCD"]
+    assert header[:4] == [
+        "TransactionID",
+        "TransactionDT",
+        "TransactionAmt",
+        "ProductCD",
+    ]
     assert header[-4:] == ["customer_id", "ts", "channel", "risk_score"]
     assert header[-5] == "V339"
     with open(raw / "identity.csv", newline="") as f:
@@ -129,7 +134,12 @@ def test_deterministic(raw, tmp_path):
     # A separate interpreter with a different hash seed must write the same bytes.
     env = {**os.environ, "PYTHONHASHSEED": "1"}
     subprocess.run(
-        [sys.executable, str(SCRIPTS / "generate_demo_data.py"), "--out", str(tmp_path)],
+        [
+            sys.executable,
+            str(SCRIPTS / "generate_demo_data.py"),
+            "--out",
+            str(tmp_path),
+        ],
         check=True,
         env=env,
         capture_output=True,
