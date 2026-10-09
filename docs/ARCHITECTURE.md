@@ -117,5 +117,5 @@ The assessment is fitted on investigated alerts, not the general transaction pop
 Holdout accuracy is not benchmark accuracy. Network expansion is bounded, and a shared
 device profile is a lead rather than proof of common ownership. Customer, merchant and
 settlement facts absent from the dataset are not invented. Community Edition on a small
-container needs the memory right-sizing in the README, and `run_benchmark.py --require-graph`
+container needs the memory right-sizing (`make graph-tune`, see ENGINEERING_NOTES.md), and `run_benchmark.py --require-graph`
 exists because one pass is not a reliable result on that hardware.

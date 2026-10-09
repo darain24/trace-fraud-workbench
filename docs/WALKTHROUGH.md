@@ -6,6 +6,11 @@ for the demo video. Everything below is true of the current build.
 Before starting, run `./scripts/demo_up.sh` and wait for the green line, then confirm the
 header reads **20/20** graph persistence.
 
+The case IDs below are the benchmark's (`TRACE_DATASET=full`). On the synthetic demo
+dataset the same beats are DEMO-009 for the shared-device network, DEMO-010 for the
+recurring-charge dispute, DEMO-006 for the cleared new phone and DEMO-001 for card testing.
+The demo's numbers are its own, not the benchmark results quoted here.
+
 ## 0:00–0:35 — The finding
 
 > "An alert is not a verdict. The dataset carries the bank's own fraud model score on every

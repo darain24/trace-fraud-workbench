@@ -2,11 +2,11 @@
 
 *Building an agentic fraud investigator on TigerGraph.*
 
-We were given six months of card transactions, 5,565 closed investigations, a fraud
+I was given six months of card transactions, 5,565 closed investigations, a fraud
 policy, and twenty alerts to investigate. Every transaction carried a risk score from the
 bank's detection model. No fraud label anywhere.
 
-The first thing we did was check whether that risk score was any good.
+The first thing I did was check whether that risk score was any good.
 
 Across all 5,565 closed cases it scores **ROC-AUC 0.053**. Not poor. *Inverted.* Nearly
 perfectly. Every single cleared case had scored 0.82 or higher.
@@ -24,7 +24,7 @@ So inside the closed-case record, a high score means "this was investigated and 
 That is exploitable. Inverting the score alone scores 93% on a balanced October holdout,
 which would have been a very good-looking number to put in a README.
 
-We do not use it. There is a test in the repository asserting that two otherwise identical
+I do not use it. There is a test in the repository asserting that two otherwise identical
 cases, one scoring 0.02 and one scoring 0.99, assess identically. The inversion is a
 property of the bank's alerting workflow, not of fraud, and the twenty benchmark cases draw
 their risk-score triggers from 0.52 to 0.90 — a different sampling frame. Fitting it would
@@ -45,7 +45,7 @@ What does predict fraud is velocity measured against the card's own rhythm, and 
 activity in the cardholder's home region — the signature of a card that was cloned rather
 than carried.
 
-We fitted a log-odds weight to each of those findings on investigations opened before
+I fitted a log-odds weight to each of those findings on investigations opened before
 October 2016, and held them out on the 278 October alerts of the same kind: **ROC-AUC
 0.849, accuracy 0.791, Brier 0.157**. Eleven named findings, each one a sentence an analyst
 can check, summed into a probability the interface shows the arithmetic for.
@@ -77,7 +77,7 @@ prior cases it drew on. The next investigation can find it by traversal, which i
 memory is supposed to mean.
 
 GraphRAG runs over a 503-document corpus in TigerGraph's vector store: the policy, the five
-documented patterns, the regulatory references, and closed-case narratives. We rank policy
+documented patterns, the regulatory references, and closed-case narratives. I rank policy
 chunks and case narratives *separately*, because pooled, 466 near-identical analyst notes
 bury the 37 policy chunks every time — and a recommendation needs a rule to cite. When the
 agent investigated the shared-device case, it retrieved R6 Shared Origin. That is the rule
@@ -86,7 +86,7 @@ it then applied.
 ## Running Community Edition on a laptop
 
 Free and complete, but the defaults assume a server. Three things mattered, and all three
-cost us hours:
+cost me hours:
 
 **Kafka Connect is allocated 10 GB out of the box.** On a 3.8 GB Docker VM the kernel's OOM
 killer takes the largest process, which is the graph store engine. Right-sizing the service
@@ -99,8 +99,8 @@ interpreted from the same reviewed bodies, against the same graph.
 **Watch the MCP layer, not just the database.** A query that returned 514 rows was taking
 159 seconds and taking GSQL down with it. Timed directly inside the container, TigerGraph
 answered in four seconds and 143 KB. The MCP server was wrapping the result in a markdown
-envelope and repeating it in its summary. We changed verification to compare an aggregate
-over the whole window plus a capped sample — which is a *stronger* check than the rows we
+envelope and repeating it in its summary. I changed verification to compare an aggregate
+over the whole window plus a capped sample — which is a *stronger* check than the rows I
 had been pulling, because it covers rows the sample never sees.
 
 The worst one took longest to find. `search_top_k_similarity` was costing 116 seconds per
@@ -123,7 +123,7 @@ cardholder's reply, states the basis for that assumption in the case file, folds
 as evidence, and recommends again. Both recommendations survive in the answer, with what
 changed between them.
 
-Two places where that needed judgement:
+Two places where that needed a careful call:
 
 A customer report *is* a denial. Asking a cardholder to validate a transaction they just
 reported is not evidence gathering, so those cases skip the request and go straight to R2.
@@ -134,21 +134,21 @@ answers nothing. R6 routes that to a report and connected-card monitoring instea
 
 Across the twenty cases: eleven fraud, six legitimate, three uncertain. Seven evidence
 requests, four of which changed the recommendation. Two suspicious activity reports — the
-policy says most cases never need one, and we read R9's reporting condition to require the
+policy says most cases never need one, and I read R9's reporting condition to require the
 coordinated, cross-customer abuse it actually describes rather than any unmatched pattern.
 
-## What we would do with more time
+## What I would do with more time
 
 Calibration is the honest gap. The weights are fitted on investigated alerts, which are not
-the general transaction population, and the probabilities are calibrated for that frame. We
+the general transaction population, and the probabilities are calibrated for that frame. I
 would want a proper reliability curve on a held-out period and a genuine cost model behind
 the thresholds rather than symmetric ones.
 
-We would also push harder on the undocumented pattern. Four of the twenty cases fit none of
-the five documented typologies, and describing them in our own words is the part we are
+I would also push harder on the undocumented pattern. Four of the twenty cases fit none of
+the five documented typologies, and describing them in my own words is the part I am
 least able to check.
 
-And we would give the agent the ability to open its own cases outside the twenty. The graph
+And I would give the agent the ability to open its own cases outside the twenty. The graph
 already supports it — the discovery view surfaces candidate device-profile clusters — but
 investigating them properly is a different problem from investigating an alert someone
 handed you.
@@ -156,8 +156,8 @@ handed you.
 ## The thing worth keeping
 
 An interface that renders beautifully and passes every schema check tells you nothing about
-whether the investigation is any good. Our first version produced twenty perfectly valid
-JSON files and scored zero out of forty on the only holdout we had.
+whether the investigation is any good. My first version produced twenty perfectly valid
+JSON files and scored zero out of forty on the only holdout I had.
 
 What fixed it was not better prompting. It was checking whether each signal pointed the
-direction we assumed, against the bank's own record of what turned out to be true.
+direction I assumed, against the bank's own record of what turned out to be true.
