@@ -4,8 +4,12 @@
 # Community Edition on a laptop VM drops a service under load, and a stack that is
 # half up looks fine in the UI right up to the moment a live investigation fails.
 # Run this before recording, and wait for the green line.
+#
+#   --graph-only  stop once TigerGraph, Ollama and MCP are up (for provisioning)
 set -uo pipefail
 cd "$(dirname "$0")/.."
+GRAPH_ONLY=0
+[ "${1:-}" = "--graph-only" ] && GRAPH_ONLY=1
 
 CONTAINER="${TG_LOCAL_CONTAINER:-tigergraph}"
 GADMIN=/home/tigergraph/tigergraph/app/cmd/gadmin
@@ -15,7 +19,12 @@ bad() { printf '  \033[31mFAIL\033[0m %s\n' "$*"; }
 
 say "1/5  TigerGraph container"
 if ! docker ps --format '{{.Names}}' | grep -qx "$CONTAINER"; then
-  docker start "$CONTAINER" >/dev/null 2>&1 || { bad "no container named $CONTAINER"; exit 1; }
+  if docker ps -a --format '{{.Names}}' | grep -qx "$CONTAINER"; then
+    docker start "$CONTAINER" >/dev/null 2>&1 || { bad "could not start $CONTAINER"; exit 1; }
+  else
+    # No container yet: create TigerGraph and the MCP server from docker-compose.yml.
+    docker compose up -d >/dev/null || { bad "docker compose up failed"; exit 1; }
+  fi
 fi
 ok "$CONTAINER running"
 
@@ -48,6 +57,10 @@ if ! lsof -ti:9001 >/dev/null 2>&1; then
   sleep 8
 fi
 lsof -ti:9001 >/dev/null 2>&1 && ok "mcp on :9001" || { bad "mcp failed; see /tmp/trace-mcp.log"; exit 1; }
+if [ "$GRAPH_ONLY" = 1 ]; then
+  printf '\033[42;30m GRAPH READY \033[0m TigerGraph, Ollama and MCP are up\n'
+  exit 0
+fi
 
 say "5/5  API and workbench"
 lsof -ti:8000 >/dev/null 2>&1 || {
