@@ -5,6 +5,9 @@
 # TRACE_DATASET in .env selects demo (synthetic) or full (the benchmark); use
 # `make full-data` instead of `make demo-data` for the latter.
 
+# The container scripts/demo_up.sh manages; the same variable it reads.
+TG_LOCAL_CONTAINER ?= tigergraph
+
 .PHONY: setup demo-data full-data ingest graph graph-load graph-tune fit up test lint
 
 setup:
@@ -35,7 +38,7 @@ graph-load:
 
 # One-off: the image is sized for a large host; this fits it to a laptop VM.
 graph-tune:
-	docker exec -u tigergraph tigergraph bash -lc '\
+	docker exec -u tigergraph $(TG_LOCAL_CONTAINER) bash -lc '\
 	G=/home/tigergraph/tigergraph/app/cmd/gadmin; \
 	$$G config set KafkaConnect.MaxMemorySizeMB 512 && \
 	$$G config set KafkaStreamLL.MaxMemorySizeMB 256 && \
