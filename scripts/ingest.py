@@ -10,7 +10,7 @@ import hashlib
 import json
 
 from tracework import store
-from tracework.config import DATA
+from tracework.config import DATA, DATASET, DEMO_MARKER
 
 
 def number(v, default=0.0):
@@ -30,7 +30,15 @@ def main():
         "closed_cases_history.csv",
     ]:
         if not (raw / f).exists():
-            raise SystemExit(f"Missing {raw / f}; run scripts/download_data.py")
+            fetch = "make demo-data" if DATASET == "demo" else "scripts/download_data.py"
+            raise SystemExit(f"Missing {raw / f}; run {fetch}")
+    if (raw / DEMO_MARKER).exists() != (DATASET == "demo"):
+        found = "synthetic demo" if DATASET == "full" else "full benchmark"
+        raise SystemExit(
+            f"{raw} holds the {found} files but TRACE_DATASET={DATASET}. Set "
+            "TRACE_DATASET in .env to match, or move data/raw aside and fetch the "
+            "other dataset."
+        )
     anchors = {}
     conflicts = set()
     historical = list(csv.DictReader(open(raw / "closed_cases_history.csv")))
@@ -156,6 +164,7 @@ def main():
                 (r["case_id"], json.dumps(r)),
             )
         report = {
+            "dataset": DATASET,
             "transactions": count,
             "identity_records": len(identity_map),
             "historical_cases": len(historical),

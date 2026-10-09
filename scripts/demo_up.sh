@@ -4,8 +4,12 @@
 # Community Edition on a laptop VM drops a service under load, and a stack that is
 # half up looks fine in the UI right up to the moment a live investigation fails.
 # Run this before recording, and wait for the green line.
+#
+#   --graph-only  stop once TigerGraph, Ollama and MCP are up (for provisioning)
 set -uo pipefail
 cd "$(dirname "$0")/.."
+GRAPH_ONLY=0
+[ "${1:-}" = "--graph-only" ] && GRAPH_ONLY=1
 
 CONTAINER="${TG_LOCAL_CONTAINER:-tigergraph}"
 GADMIN=/home/tigergraph/tigergraph/app/cmd/gadmin
@@ -15,7 +19,12 @@ bad() { printf '  \033[31mFAIL\033[0m %s\n' "$*"; }
 
 say "1/5  TigerGraph container"
 if ! docker ps --format '{{.Names}}' | grep -qx "$CONTAINER"; then
-  docker start "$CONTAINER" >/dev/null 2>&1 || { bad "no container named $CONTAINER"; exit 1; }
+  if docker ps -a --format '{{.Names}}' | grep -qx "$CONTAINER"; then
+    docker start "$CONTAINER" >/dev/null 2>&1 || { bad "could not start $CONTAINER"; exit 1; }
+  else
+    # No container yet: create TigerGraph and the MCP server from docker-compose.yml.
+    docker compose up -d >/dev/null || { bad "docker compose up failed"; exit 1; }
+  fi
 fi
 ok "$CONTAINER running"
 
@@ -33,6 +42,14 @@ for i in $(seq 1 60); do
   # GUI and KAFKACONN are deliberately down; everything else must be Online.
   pending=$(grep -E 'Warmup|Down' <<<"$status" | grep -vE 'GUI|KAFKACONN' || true)
   if [ -z "$pending" ]; then ok "graph services online (GUI and KafkaConnect left off)"; break; fi
+  # A fresh container has no graph yet, and GSE and GPE stay in Warmup until a
+  # schema exists ("rc: kNotFound" in the GSE log). GSQL is all that installing
+  # the schema needs, so waiting for the rest here would wait forever.
+  if [ -z "$(grep -vE 'GSE|GPE' <<<"$pending")" ] &&
+    docker exec -u tigergraph "$CONTAINER" tail -n 20 /home/tigergraph/tigergraph/log/gse/log.INFO 2>/dev/null |
+    grep -q 'rc: kNotFound'; then
+    ok "GSQL online; no graph schema yet, so GSE and GPE warm up after it is installed"; break
+  fi
   [ "$i" = 60 ] && { bad "services still not online"; echo "$pending"; exit 1; }
   sleep 15
 done
@@ -42,12 +59,23 @@ curl -sf -m 5 http://127.0.0.1:11434/api/tags >/dev/null 2>&1 || { nohup ollama 
 curl -sf -m 5 http://127.0.0.1:11434/api/tags >/dev/null 2>&1 && ok "ollama responding" || bad "ollama not responding"
 
 say "4/5  TigerGraph MCP server"
-if ! lsof -ti:9001 >/dev/null 2>&1; then
-  nohup uv run tigergraph-mcp --env-file .env --transport streamable-http \
-    --host 127.0.0.1 --port 9001 >/tmp/trace-mcp.log 2>&1 &
+# Ask the server itself: with docker compose the TigerGraph container publishes
+# :9001, so the port stays bound even while the MCP container is stopped.
+mcp_up() { curl -s -m 5 -o /dev/null http://127.0.0.1:9001/mcp; }
+if ! mcp_up; then
+  if docker compose ps -a -q mcp 2>/dev/null | grep -q .; then
+    docker compose start mcp >/dev/null 2>&1
+  else
+    nohup uv run tigergraph-mcp --env-file .env --transport streamable-http \
+      --host 127.0.0.1 --port 9001 >/tmp/trace-mcp.log 2>&1 &
+  fi
   sleep 8
 fi
-lsof -ti:9001 >/dev/null 2>&1 && ok "mcp on :9001" || { bad "mcp failed; see /tmp/trace-mcp.log"; exit 1; }
+mcp_up && ok "mcp on :9001" || { bad "mcp failed; see /tmp/trace-mcp.log or docker compose logs mcp"; exit 1; }
+if [ "$GRAPH_ONLY" = 1 ]; then
+  printf '\033[42;30m GRAPH READY \033[0m TigerGraph, Ollama and MCP are up\n'
+  exit 0
+fi
 
 say "5/5  API and workbench"
 lsof -ti:8000 >/dev/null 2>&1 || {

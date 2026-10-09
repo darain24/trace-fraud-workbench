@@ -1,0 +1,61 @@
+# TigerGraph Community Edition plus the official TigerGraph MCP server on :9001.
+#
+#   docker compose up -d      # or let `make graph` / `make up` start it
+#
+# Every port is bound to loopback: these are Community Edition's default
+# credentials. Ollama stays on the host, where it can use the GPU:
+#
+#   ollama pull qwen3:4b && ollama pull all-minilm
+#
+# `docker compose down` deletes the container and the graph with it; use
+# `docker compose stop` to keep it. The image is amd64 and runs emulated on Apple
+# Silicon. On a small Docker VM, right-size it once with `make graph-tune`.
+name: trace
+
+services:
+  tigergraph:
+    image: tigergraph/community:4.2.5
+    platform: linux/amd64
+    # scripts/demo_up.sh and run_benchmark.py address the container by this name.
+    container_name: tigergraph
+    ulimits:
+      nofile:
+        soft: 1000000
+        hard: 1000000
+    ports:
+      - "127.0.0.1:14022:22"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:14240:14240"
+      - "127.0.0.1:9001:9001" # the MCP server, which shares this network
+
+  mcp:
+    build:
+      dockerfile_inline: |
+        FROM python:3.12-slim
+        RUN pip install --no-cache-dir tigergraph-mcp==1.0.3
+    command:
+      - tigergraph-mcp
+      - --transport
+      - streamable-http
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9001"
+    # The workbench forwards its own TG_HOST (http://127.0.0.1) with every MCP
+    # call, so the server must see TigerGraph on its loopback, as it does when
+    # it runs on the host.
+    network_mode: service:tigergraph
+    environment:
+      TG_HOST: http://127.0.0.1
+      TG_RESTPP_PORT: "9000"
+      TG_GS_PORT: "14240"
+      TG_GRAPHNAME: ${TG_GRAPHNAME:-Trace}
+      TG_USERNAME: ${TG_USERNAME:-tigergraph}
+      TG_PASSWORD: ${TG_PASSWORD:-tigergraph}
+      # Every call re-checks the graph first; an emulated container under load
+      # can take longer than the default 10 s to answer that check.
+      TG_HTTP_VALIDATE_TIMEOUT: "60"
+    depends_on:
+      - tigergraph
+    # The graph takes minutes to warm up; keep the server up until it answers.
+    restart: unless-stopped

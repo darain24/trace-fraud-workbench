@@ -91,7 +91,7 @@ function Empty({ title, body }: { title: string; body: string }) {
 export default function App() {
   const [page, setPage] = useState("Investigations");
   const [cases, setCases] = useState<Dict[]>([]);
-  const [selected, setSelected] = useState("HHG-014");
+  const [selected, setSelected] = useState("");
   const [detail, setDetail] = useState<Dict | null>(null);
   const [health, setHealth] = useState<Dict | null>(null);
   const [metrics, setMetrics] = useState<Dict | null>(null);
@@ -115,8 +115,16 @@ export default function App() {
     const [c, m] = await Promise.all([api("/cases"), api("/evaluation")]);
     setCases(c);
     setMetrics(m);
+    // The benchmark and the synthetic demo dataset carry different case IDs.
+    setSelected(
+      (s) =>
+        s ||
+        (c.find((x: Dict) => x.case_id === "HHG-014") ?? c[0])?.case_id ||
+        "",
+    );
   }, []);
   const loadCase = useCallback(async () => {
+    if (!selected) return;
     const [d, e, a] = await Promise.all([
       api("/cases/" + selected),
       api("/cases/" + selected + "/events"),
@@ -497,7 +505,7 @@ export default function App() {
                             title={
                               record?.written_to_graph
                                 ? "Case persistence confirmed."
-                                : "Real benchmark data · TigerGraph integration not yet verified"
+                                : "TigerGraph integration not yet verified"
                             }
                           >
                             <span className="status-dot" />

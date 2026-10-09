@@ -426,6 +426,9 @@ async def main(args):
                 "dimension": 384,
                 "metric": "COSINE",
             },
+            # A global schema change; on an emulated container it outlasts the
+            # default call timeout while still succeeding on the server.
+            timeout=INSTALL_TIMEOUT,
         )
     if args.data:
         await load(args.full)

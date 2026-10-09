@@ -3,13 +3,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 from tracework import engine, store
-from tracework.config import ROOT
+from tracework.config import DATASET, ROOT
 from tracework.models import Answer
 
 with store.connect() as c:
     ids = [r[0] for r in c.execute("SELECT id FROM cases ORDER BY id")]
 if len(ids) != 20:
     raise SystemExit("Expected exactly twenty benchmark cases")
+# Only the benchmark's answers belong in the repository; demo answers stay local.
+dest = (
+    ROOT / "examples" / "benchmark-results"
+    if DATASET == "full"
+    else ROOT / "output" / "demo-results"
+)
 answers = []
 for id in ids:
     a = Answer.model_validate(store.get_case(id)["result"])
@@ -19,6 +25,7 @@ for id in ids:
             f"{id}: export blocked; verify TigerGraph graph/vector evidence, persistence, and output integrity first."
         )
     answers.append(a)
+dest.mkdir(parents=True, exist_ok=True)
 for a in answers:
-    (ROOT / "examples" / "benchmark-results" / f"{a.case_id}.json").write_text(a.model_dump_json(indent=2))
-print("Exported 20 verified results to examples/benchmark-results/")
+    (dest / f"{a.case_id}.json").write_text(a.model_dump_json(indent=2))
+print(f"Exported 20 verified results to {dest.relative_to(ROOT)}/")
