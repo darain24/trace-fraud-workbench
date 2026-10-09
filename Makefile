@@ -24,8 +24,11 @@ full-data:
 ingest:
 	uv run python scripts/ingest.py
 
-# First run: start TigerGraph and MCP, install the schema and queries, load.
+# First run: start TigerGraph and MCP, right-size it, install the schema and
+# queries, load.
 graph:
+	./scripts/demo_up.sh --graph-only
+	$(MAKE) graph-tune
 	./scripts/demo_up.sh --graph-only
 	uv run python scripts/provision_tigergraph.py --schema
 	$(MAKE) graph-load
@@ -36,7 +39,7 @@ graph-load:
 	uv run python scripts/provision_tigergraph.py --data --documents --reset-documents
 	uv run python scripts/verify_tigergraph.py
 
-# One-off: the image is sized for a large host; this fits it to a laptop VM, and
+# The image is sized for a large host; this fits it to a laptop VM, and
 # lifts the 16 s query timeout that an emulated container's first loads exceed.
 graph-tune:
 	docker exec -u tigergraph $(TG_LOCAL_CONTAINER) bash -lc '\
