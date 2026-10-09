@@ -1228,7 +1228,7 @@ case behind it.
 
 ### 4. Exposure
 
-Exposure is the total amount of the transactions judged to be part of the episode.
+Exposure is the total amount of the transactions found to be part of the episode.
 It drives the approval route and the reporting threshold, so the episode is scoped
 narrowly: the same card, the same channel, close in time to the flagged transaction.
 
